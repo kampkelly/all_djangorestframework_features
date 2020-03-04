@@ -1,0 +1,31 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api_v1/categories:
+    get:
+      operationId: listCategorys
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''
+  /api_v1/fn/categories:
+    get:
+      operationId: listlist_categories
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''

@@ -15,8 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.schemas import get_schema_view
+
+schema_url_patterns = [
+    path('api_v1/', include('api_v1.urls')),
+]
+
+schema_view = get_schema_view(
+    title="Notes App",
+    description="API for all things …",
+    version="1.0.0",
+    patterns=schema_url_patterns,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api_v1/', include('api_v1.urls', namespace='api_v1'))
+    path('api_v1/', include('api_v1.urls', namespace='api_v1')),
+    path('api_v1/openapi', schema_view)
 ]

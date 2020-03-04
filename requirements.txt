@@ -2,3 +2,5 @@ djangorestframework
 Django
 cryptography
 psycopg2
+pyyaml
+uritemplate
