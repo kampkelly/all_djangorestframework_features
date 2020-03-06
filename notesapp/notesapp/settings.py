@@ -41,6 +41,13 @@ INSTALLED_APPS = [
     'api_v1.apps.ApiV1Config'
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSION': 'api_v1',
+    'ALLOWED_VERSIONS': ['api_v1', 'api_v2'],
+    'VERSION_PARAM': 'version'
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

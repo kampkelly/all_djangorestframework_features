@@ -13,6 +13,8 @@ categories = Category.CategoryView.as_view({
 })
 
 urlpatterns = [
+    # class based views urls
     path('categories', categories, name='categories'),
+    # function based views urls
     path('fn/categories', list_categories, name='categories')
 ]
