@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.schemas import get_schema_view
+from rest_framework.urlpatterns import format_suffix_patterns
 
 schema_url_patterns = [
     path('api_v1/', include('api_v1.urls')),
@@ -34,3 +35,5 @@ urlpatterns = [
     path('api_v2/', include('api_v1.urls', namespace='api_v2')),
     path('api_v1/openapi', schema_view)
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns, suffix_required=False, allowed=['json'])

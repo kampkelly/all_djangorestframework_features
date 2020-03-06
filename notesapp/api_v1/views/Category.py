@@ -7,7 +7,7 @@ from api_v1.models import Category
 from api_v1.serializers import CategorySerializer
 
 class CategoryView(ViewSet):
-    def list(self, request):
+    def list(self, request, format=None):
         if request.version == 'api_v1':
             categories = Category.objects.all()
             serializer = CategorySerializer(categories, many=True)
@@ -19,7 +19,7 @@ class CategoryView(ViewSet):
 
 class CategoryFunctionView:
     @api_view(['GET'])
-    def list_categories(request):
+    def list_categories(request, format=None):
         if request.version == 'api_v2':
             categories = Category.objects.all()
             serializer = CategorySerializer(categories, many=True)
