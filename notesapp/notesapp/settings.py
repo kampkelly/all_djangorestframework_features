@@ -45,7 +45,15 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'api_v1',
     'ALLOWED_VERSIONS': ['api_v1', 'api_v2'],
-    'VERSION_PARAM': 'version'
+    'VERSION_PARAM': 'version',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '5/minute'
+    }
 }
 
 MIDDLEWARE = [

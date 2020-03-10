@@ -14,6 +14,8 @@ router.register(r'categories', Category.CategoryView, 'categories')
 
 urlpatterns = [
     # function based views urls
-    path('fn/categories', list_categories, name='categories')
+    path('fn/categories', list_categories, name='categories'),
+    # class based views urls
+    path('cls/categories', Category.CategoryAPIView.as_view(), name='categories')
 ]
 urlpatterns += router.urls
