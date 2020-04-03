@@ -11,7 +11,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.decorators import action
 
 from api_v1.models import Category
-from api_v1.serializers import CategorySerializer
+from api_v1.serializers import CategoryModelSerializer, CategorySerializer
 from api_v1.helpers.throttles import UserThrottlePerMinute
 
 
@@ -37,6 +37,40 @@ class CategoryAPIView(APIView):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        data = {'name':request.data['name']}
+        serializer = CategorySerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.save()
+        except:
+            return Response('An error occured', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get(self, request, pk=None, format=None): # for detail
+        category = Category.objects.get(pk=1)
+        if category:
+            serializer = CategorySerializer(category)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('category not found', status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk=None, format=None):
+        data = {'name':request.data['name']}
+        category = Category.objects.get(pk=pk)
+        if category:
+            serializer = CategorySerializer(category, data=data)
+            if serializer.is_valid():
+                try:
+                    serializer.save()
+                except:
+                    return Response('An error occured', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response('category not found', status=status.HTTP_404_NOT_FOUND)
 
 
 class CategoryListMixins(mixins.ListModelMixin,
@@ -82,7 +116,7 @@ class CategoryListGenericApiView(generics.ListCreateAPIView):
     Even simpler way of implementing `class CategoryListMixins`.
     '''
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoryModelSerializer
 
 
 class CategoryDetailGenericApiView(generics.RetrieveUpdateDestroyAPIView):
@@ -90,7 +124,7 @@ class CategoryDetailGenericApiView(generics.RetrieveUpdateDestroyAPIView):
     Even simpler way of implementing `class CategoryDetailMixins`.
     '''
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoryModelSerializer
 
 
 class CategoryView(ViewSet):
@@ -106,7 +140,7 @@ class CategoryView(ViewSet):
         '''
         if request.version == 'api_v1':
             categories = Category.objects.all()
-            serializer = CategorySerializer(categories, many=True)
+            serializer = CategoryModelSerializer(categories, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             WrongVersion.default_detail = 'Accessing wrong api version, use api_v1'
@@ -118,7 +152,7 @@ class CategoryView(ViewSet):
         '''
         if request.version == 'api_v1':
             categories = Category.objects.all()
-            serializer = CategorySerializer(categories, many=True)
+            serializer = CategoryModelSerializer(categories, many=True)
             return Response('picking a particular object', status=status.HTTP_200_OK)
         else:
             WrongVersion.default_detail = 'Accessing wrong api version, use api_v1'
@@ -134,7 +168,7 @@ class CategoryView(ViewSet):
         '''
         if request.version == 'api_v1':
             categories = Category.objects.all()
-            serializer = CategorySerializer(categories, many=True)
+            serializer = CategoryModelSerializer(categories, many=True)
             return Response('serializer.data', status=status.HTTP_200_OK)
         else:
             WrongVersion.default_detail = 'Accessing wrong api version, use api_v1'
@@ -165,7 +199,7 @@ class CategoryFunctionView:
         '''
         if request.version == 'api_v2':
             categories = Category.objects.all()
-            serializer = CategorySerializer(categories, many=True)
+            serializer = CategoryModelSerializer(categories, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             WrongVersion.default_detail = 'Accessing wrong api version, use api_v2'
