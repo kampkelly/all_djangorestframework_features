@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
 from .models import Category
-from .helpers.validators import Validations
+from .helpers.validators import CategoryValidations
 
-class CategoryModelSerializer(serializers.ModelSerializer, Validations):
+class CategoryModelSerializer(serializers.ModelSerializer, CategoryValidations):
 
     class Meta:
         model = Category
@@ -18,10 +18,9 @@ class CategoryModelSerializer(serializers.ModelSerializer, Validations):
         return data
 
     
-
-class CategorySerializer(serializers.ModelSerializer, Validations):
+class CategorySerializer(serializers.ModelSerializer, CategoryValidations):
     id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(required=True, max_length=255)
+    name = serializers.CharField(required=True, max_length=255, validators=CategoryValidations().check_name_is_unique)
     class Meta:
         model = Category
         fields = ['id', 'name']
