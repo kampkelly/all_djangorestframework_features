@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status, viewsets, mixins, generics
 from rest_framework.exceptions import APIException
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination, CursorPagination
 
 from api_v1.models import Category
 from api_v1.serializers import CategoryModelSerializer, CategorySerializer
@@ -21,6 +22,33 @@ class WrongVersion(APIException):
     default_code = 'wrong_api_version'
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 3
+    page_query_param = 'page'
+    max_page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'count': self.page.paginator.count,
+            'results': data
+        })
+
+class StandardCursorPagination(CursorPagination):
+    '''
+    This pagination requires that there is a unique, unchanging ordering of items in the result set.
+    This ordering might typically be a creation timestamp on the records, as this presents a 
+    consistent ordering to paginate against
+    '''
+    page_size = 2
+    ordering ='created_at'
+    page_query_param = 'page'
+    max_page_size = 10
+
+
 class CategoryAPIView(APIView):
     '''
     This class based view does not automatically provides `list`, `create`, `retrieve`,
@@ -29,6 +57,7 @@ class CategoryAPIView(APIView):
     But http methods such as get, post, put, delete, etc can be added.
     See mixins for methods that can be added here.
     '''
+    pagination_class = StandardResultsSetPagination
     throttle_classes = [UserThrottlePerMinute]
     def get(self, request, format=None):
         """
@@ -48,13 +77,13 @@ class CategoryAPIView(APIView):
             return Response('An error occured', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get(self, request, pk=None, format=None): # for detail
-        category = Category.objects.get(pk=1)
-        if category:
-            serializer = CategorySerializer(category)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response('category not found', status=status.HTTP_404_NOT_FOUND)
+    # def get(self, request, pk=None, format=None): # for detail
+    #     category = Category.objects.get(pk=1)
+    #     if category:
+    #         serializer = CategorySerializer(category)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response('category not found', status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk=None, format=None):
         data = {'name':request.data['name']}
@@ -82,6 +111,7 @@ class CategoryListMixins(mixins.ListModelMixin,
     '''
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = StandardCursorPagination
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -117,6 +147,7 @@ class CategoryListGenericApiView(generics.ListCreateAPIView):
     '''
     queryset = Category.objects.all()
     serializer_class = CategoryModelSerializer
+    pagination_class = StandardResultsSetPagination
 
 
 class CategoryDetailGenericApiView(generics.RetrieveUpdateDestroyAPIView):
