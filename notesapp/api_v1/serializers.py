@@ -1,13 +1,47 @@
 from rest_framework import serializers
 
-from .models import Category
+from .models import Category, Notes, User, Person
 from .helpers.validators import CategoryValidations
 
-class CategoryModelSerializer(serializers.ModelSerializer, CategoryValidations):
+
+class PersonModelSerializer(serializers.ModelSerializer):
 
     class Meta:
+        model = Person
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'is_superuser', 'is_active']
+        extra_kwargs = {'password': {'write_only': True}, 'is_superuser': {'write_only': True}}
+
+    def create(self, validated_data):
+        person = Person(
+            email = validated_data['email'],
+            username = validated_data['username'],
+            first_name = validated_data['first_name'],
+            last_name = validated_data['last_name']
+        )
+        person.set_password(validated_data['password'])
+        person.save()
+        return person
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
+        return instance
+
+class NotesModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Notes
+        fields = ['title', 'body', 'category']
+
+
+class CategoryModelSerializer(serializers.ModelSerializer, CategoryValidations):
+    notes = NotesModelSerializer(many=True, read_only=True)
+    # to display a string field instead of whole object
+    # notes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='title')
+    class Meta:
         model = Category
-        fields = ['name']
+        fields = ['name', 'notes']
 
     def validate(self, data):
         '''
@@ -45,3 +79,4 @@ class CategorySerializer(serializers.ModelSerializer, CategoryValidations):
     # def save(self):
     #     name = self.validated_data['name']
     #     pass
+

@@ -23,11 +23,14 @@ class WrongVersion(APIException):
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 3
+    page_size = 10
     page_query_param = 'page'
     max_page_size = 10
 
     def get_paginated_response(self, data):
+        '''
+        Modifies how the response will be displayed.
+        '''
         return Response({
             'links': {
                 'next': self.get_next_link(),
@@ -41,9 +44,9 @@ class StandardCursorPagination(CursorPagination):
     '''
     This pagination requires that there is a unique, unchanging ordering of items in the result set.
     This ordering might typically be a creation timestamp on the records, as this presents a 
-    consistent ordering to paginate against
+    consistent ordering to paginate against.
     '''
-    page_size = 2
+    page_size = 10
     ordering ='created_at'
     page_query_param = 'page'
     max_page_size = 10

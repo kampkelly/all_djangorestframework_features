@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 
-from .views import Category
+from .views import Category, Notes, User
 
 app_name = 'api_v1'
 
@@ -11,6 +11,8 @@ router = routers.SimpleRouter()
 list_categories = Category.CategoryFunctionView.list_categories
 
 # class based views routes
+router.register(r'users', User.UserViewSet, 'user-ViewSet')
+router.register(r'notes', Notes.NotesViewSet, 'notes-ViewSet')
 router.register(r'categories', Category.CategoryView, 'categories-ViewSet')
 router.register(r'cat', Category.CategoryViewSet, 'cat-viewsets')
 
